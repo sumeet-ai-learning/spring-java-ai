@@ -2,12 +2,17 @@ package com.learning.multimodel.controller;
 
 import com.learning.multimodel.models.CountryCodes;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+
+import java.util.UUID;
+
+import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
 @RestController
 @RequestMapping("/api")
@@ -16,13 +21,15 @@ public class MultiModelChatController {
     private final ChatClient openAiChatClient;
     private final ChatClient ollamaChatClient;
     private final ChatClient chatMemoryChatClient;
+    private final ChatClient chatToolsClient;
 
     public MultiModelChatController(@Qualifier("openAiChatClient") ChatClient openAiChatClient,
-            @Qualifier("ollamaChatClient") ChatClient ollamaChatClient, @Qualifier("chatMemoryChatClient") ChatClient chatMemoryChatClient) {
+            @Qualifier("ollamaChatClient") ChatClient ollamaChatClient, @Qualifier("chatMemoryChatClient") ChatClient chatMemoryChatClient,
+                                    @Qualifier("chatToolsClient") ChatClient chatToolsClient) {
         this.openAiChatClient = openAiChatClient;
         this.ollamaChatClient = ollamaChatClient;
         this.chatMemoryChatClient = chatMemoryChatClient;
-
+        this.chatToolsClient = chatToolsClient;
     }
 
     @GetMapping("/openai/chat")
@@ -95,8 +102,17 @@ public class MultiModelChatController {
     }
 
     @GetMapping("/memory/answer")
-    public String chatMemoryQuery(@RequestParam String message) {
+    public String chatMemoryQuery(@RequestParam String message, @RequestParam String uuid) {
         return chatMemoryChatClient.prompt()
+                .user(message)
+                .advisors(advisorSpec -> advisorSpec.param(CONVERSATION_ID,uuid))
+                .call()
+                .content();
+    }
+
+    @GetMapping("/localtime")
+    public String localTime(@RequestParam String message) {
+        return chatToolsClient.prompt()
                 .user(message)
                 .call()
                 .content();
