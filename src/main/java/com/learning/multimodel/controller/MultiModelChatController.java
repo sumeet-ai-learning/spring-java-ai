@@ -22,14 +22,18 @@ public class MultiModelChatController {
     private final ChatClient ollamaChatClient;
     private final ChatClient chatMemoryChatClient;
     private final ChatClient chatToolsClient;
+    private final ChatClient mcpChatClient;
 
     public MultiModelChatController(@Qualifier("openAiChatClient") ChatClient openAiChatClient,
-            @Qualifier("ollamaChatClient") ChatClient ollamaChatClient, @Qualifier("chatMemoryChatClient") ChatClient chatMemoryChatClient,
+              @Qualifier("ollamaChatClient") ChatClient ollamaChatClient,
+                                    @Qualifier("chatMemoryChatClient") ChatClient chatMemoryChatClient,
+                                    @Qualifier("mcpChatClient") ChatClient mcpChatClient,
                                     @Qualifier("chatToolsClient") ChatClient chatToolsClient) {
         this.openAiChatClient = openAiChatClient;
         this.ollamaChatClient = ollamaChatClient;
         this.chatMemoryChatClient = chatMemoryChatClient;
         this.chatToolsClient = chatToolsClient;
+        this.mcpChatClient = mcpChatClient;
     }
 
     @GetMapping("/openai/chat")

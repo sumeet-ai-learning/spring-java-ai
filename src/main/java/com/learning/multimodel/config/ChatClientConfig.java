@@ -9,6 +9,7 @@ import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class ChatClientConfig {
         return ChatClient.create(openAiChatModel);
     }
 
+    @Primary
     @Bean(name = "ollamaChatClient")
     public ChatClient ollamaChatClient(OllamaChatModel ollamaChatModel) {
         ChatClient.Builder chatClientBulder = ChatClient.builder(ollamaChatModel)
